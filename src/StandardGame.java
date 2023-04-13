@@ -1,8 +1,6 @@
 import java.util.Random;
 import java.util.Scanner;
 
-import static java.lang.System.exit;
-
 public class StandardGame extends Game {
     private final static Scanner scanner = new Scanner(System.in);
     enum Moves {
@@ -27,12 +25,12 @@ public class StandardGame extends Game {
 
     }
 
-    public void standardGame(String name) {
+    public void standardGame() {
         Random random = new Random();
         System.out.println("Okay, let's start");
         System.out.println("You can type !exit to exit and !rating for your rating");
 
-        int score = getCurrentScore(name);
+        int score = 0;
         Moves[] moves = Moves.values();
         String playerInput = "";
         int compareMoves = 0;
@@ -40,12 +38,7 @@ public class StandardGame extends Game {
         while (!playerInput.equals("!exit")) {
             Moves computerMove = moves[random.nextInt(moves.length)];
             playerInput = scanner.nextLine();
-
-            if (playerInput.equals("!exit")) {
-                System.out.println("Bye!");
-                exit(0);
-            } else if (playerInput.equals("!rating")) {
-                System.out.printf("Your rating: %d%n", score);
+            if(checkInput(playerInput, score)) {
                 continue;
             }
 
@@ -57,16 +50,9 @@ public class StandardGame extends Game {
                 continue;
             }
 
-            String message = "";
             String computerMoveMessage = computerMove.toString().toLowerCase();
-            switch (compareMoves) {
-                case 0 -> message = String.format("There is a draw (%s)", computerMoveMessage);
-                case 1 -> message = String.format("Well done. The computer chose %s and failed",
-                        computerMoveMessage);
-                case -1 -> message = String.format("Sorry, but the computer chose %s", computerMoveMessage);
-            }
+            resultMessage(compareMoves, computerMoveMessage);
 
-            System.out.println(message);
             score = updateScore(compareMoves, score);
 
         }

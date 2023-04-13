@@ -2,52 +2,47 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
-import static java.lang.System.exit;
-
 public class CustomGame extends Game {
     private final static Scanner scanner = new Scanner(System.in);
 
     public int customCompareMove(String computerMove, String[] winnersAgainstPlayer, String[] losersAgainstPlayer) {
         int returnStatement = 0;
 
-        for (int i = 0; i < winnersAgainstPlayer.length; i++) {
-            if (computerMove.equals(winnersAgainstPlayer[i])) {
+        for (String winner : winnersAgainstPlayer) {
+            if (computerMove.equals(winner)) {
                 returnStatement = -1;
+                break;
             }
         }
 
-        for (int i = 0; i < losersAgainstPlayer.length; i++) {
-            if (computerMove.equals(losersAgainstPlayer[i])) {
+        for (String loser : losersAgainstPlayer) {
+            if (computerMove.equals(loser)) {
                 returnStatement = 1;
+                break;
             }
         }
 
         return returnStatement;
     }
 
-    public void customGame(String name, String input) {
+    public void customGame(String input) {
         System.out.println("Okay, let's start");
         System.out.println("You can type !exit to exit and !rating for your rating");
 
         String[] moves = input.split(",");
-
         String playerMove = "";
 
-        int score = getCurrentScore(name);
+        int score = 0;
         while (!playerMove.equals("!exit")) {
             playerMove = scanner.nextLine();
-
-            if (playerMove.equals("!rating")) {
-                System.out.printf("Your rating: %d%n", score);
+            if(checkInput(playerMove, score)) {
                 continue;
             }
 
-            if (playerMove.equals("!exit")) {
-                System.out.println("Bye!");
-                exit(0);
-            }
-
             while (!Arrays.asList(moves).contains(playerMove)) {
+                if(checkInput(playerMove, score)) {
+                    continue;
+                }
                 System.out.println("Invalid move");
                 playerMove = scanner.nextLine();
             }
@@ -55,10 +50,6 @@ public class CustomGame extends Game {
             Random random = new Random();
             int randomInt = random.nextInt(moves.length);
             String computerMove = moves[randomInt];
-
-//            if (playerMove.equals(computerMove)) {
-//                System.out.println("Draw");
-//            }
 
             int indexOfPlayerMove = 0;
             for (int i = 0; i < moves.length; i++) {
@@ -77,12 +68,6 @@ public class CustomGame extends Game {
                 i++;
             }
 
-//            System.out.println("Winners against " + playerMove + ":");
-//            for (int j = 0; j < winnersAgainstPlayer.length; j++) {
-//                System.out.printf("%s ", winnersAgainstPlayer[j]);
-//            }
-//            System.out.println();
-
             String[] losersAgainstPlayer = new String[moves.length / 2];
             int index = indexOfPlayerMove - 1;
             for (int j = 0; j < losersAgainstPlayer.length; j++) {
@@ -93,21 +78,10 @@ public class CustomGame extends Game {
                 index--;
             }
 
-//            System.out.println("Losers against " + playerMove + ":");
-//            for (int j = 0; j < losersAgainstPlayer.length; j++) {
-//                System.out.printf("%s ", losersAgainstPlayer[j]);
-//            }
-//            System.out.println();
+            int result = customCompareMove(computerMove, winnersAgainstPlayer, losersAgainstPlayer);
 
-            String message = "";
-            switch (customCompareMove(computerMove, winnersAgainstPlayer, losersAgainstPlayer)) {
-                case 0 -> message = String.format("There is a draw (%s)", computerMove);
-                case 1 -> message = String.format("Well done. The computer chose %s and failed",
-                        computerMove);
-                case -1 -> message = String.format("Sorry, but the computer chose %s", computerMove);
-            }
-            System.out.println(message);
-            score = updateScore(customCompareMove(computerMove, winnersAgainstPlayer, losersAgainstPlayer), score);
+            resultMessage(result, computerMove);
+            score = updateScore(result, score);
         }
 
     }
